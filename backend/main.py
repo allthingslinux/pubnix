@@ -12,6 +12,7 @@ from routers import web as web_routes
 from routers import ssh_keys
 from routers import comm as comm_routes
 from routers import admin as admin_routes
+from routers import integrations as integrations_routes
 
 
 @asynccontextmanager
@@ -48,6 +49,7 @@ app.include_router(web_routes.router)
 app.include_router(ssh_keys.router, prefix="/api/v1")
 app.include_router(comm_routes.router, prefix="/api/v1")
 app.include_router(admin_routes.router, prefix="/api/v1")
+app.include_router(integrations_routes.router, prefix="/api/v1")
 
 
 @app.get("/")
