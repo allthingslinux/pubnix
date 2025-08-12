@@ -1,11 +1,11 @@
 """SSH key parsing and validation utilities."""
+
 from __future__ import annotations
 
 import base64
 import hashlib
 from dataclasses import dataclass
-from typing import List, Tuple
-
+from typing import List
 
 ALLOWED_ALGORITHMS = {
     "ssh-ed25519",
@@ -51,8 +51,10 @@ class SshKeyService:
     @staticmethod
     def build_authorized_keys(keys: List[str]) -> str:
         """Build authorized_keys content from a list of public keys."""
-        valid_lines: List[str] = []
+        valid_lines: list[str] = []
         for key in keys:
             parsed = SshKeyService.parse_public_key(key)
-            valid_lines.append(f"{parsed.algorithm} {parsed.key_b64} {parsed.comment}".strip())
+            valid_lines.append(
+                f"{parsed.algorithm} {parsed.key_b64} {parsed.comment}".strip()
+            )
         return "\n".join(valid_lines) + ("\n" if valid_lines else "")

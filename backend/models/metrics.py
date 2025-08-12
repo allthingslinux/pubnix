@@ -1,6 +1,6 @@
 """System and user metrics models for ATL Pubnix."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlmodel import Field, SQLModel
@@ -12,7 +12,9 @@ class SystemMetrics(SQLModel, table=True):
     __tablename__ = "system_metrics"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    timestamp: datetime = Field(default_factory=datetime.utcnow, index=True)
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc), index=True
+    )
     total_users: int = Field(description="Total number of users")
     active_users_24h: int = Field(description="Users active in last 24 hours")
     cpu_usage_percent: float = Field(description="System CPU usage percentage")
@@ -37,7 +39,9 @@ class UserMetrics(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str = Field(index=True, description="Username for these metrics")
-    timestamp: datetime = Field(default_factory=datetime.utcnow, index=True)
+    timestamp: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc), index=True
+    )
     cpu_time_seconds: int = Field(
         default=0, description="Total CPU time used in seconds"
     )

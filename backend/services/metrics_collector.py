@@ -1,8 +1,10 @@
 """Collect system and user metrics (stubbed for tests)."""
+
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Iterable, List
+from collections.abc import Iterable
+from datetime import datetime, timezone
+from typing import List
 
 import psutil
 
@@ -24,11 +26,11 @@ class MetricsCollector:
             network_connections=net_conns,
             ssh_sessions=0,
             web_requests_per_hour=0,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
     def collect_user_metrics(self, usernames: Iterable[str]) -> List[UserMetrics]:
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         # Stub: produce zeroed metrics for each user for testing
         return [
             UserMetrics(

@@ -13,6 +13,6 @@ async def auth_info():
 
 # TODO: Implement JWT authentication endpoints
 # - POST /login
-# - POST /logout  
+# - POST /logout
 # - GET /me
 # - POST /refresh

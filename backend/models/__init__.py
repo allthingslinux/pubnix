@@ -1,6 +1,8 @@
 """ATL Pubnix Data Models exports."""
 
+from .comm import Message
 from .metrics import SystemMetrics, UserMetrics
+from .ssh_key import SshKey
 from .user import (
     Application,
     ApplicationStatus,
@@ -8,8 +10,6 @@ from .user import (
     User,
     UserStatus,
 )
-from .ssh_key import SshKey
-from .comm import Message
 
 __all__ = [
     "User",

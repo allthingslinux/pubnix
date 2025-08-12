@@ -1,8 +1,8 @@
 """Resource limit enforcement for ATL Pubnix users."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List
 
 from models import ResourceLimits, UserMetrics
 
@@ -20,8 +20,8 @@ class ResourceEnforcer:
 
     def check_user_violations(
         self, metrics: UserMetrics, limits: ResourceLimits
-    ) -> List[Violation]:
-        violations: List[Violation] = []
+    ) -> list[Violation]:
+        violations: list[Violation] = []
 
         if metrics.active_processes > limits.max_processes:
             violations.append(
@@ -65,12 +65,14 @@ class ResourceEnforcer:
 
         return violations
 
-    def build_enforcement_commands(self, username: str, violations: List[Violation]) -> List[str]:
+    def build_enforcement_commands(
+        self, username: str, violations: list[Violation]
+    ) -> list[str]:
         """Return shell commands that would mitigate the violations.
 
         These are conservative defaults; production may replace with more nuanced actions.
         """
-        cmds: List[str] = []
+        cmds: list[str] = []
         kinds = {v.kind for v in violations}
         if "processes" in kinds or "memory" in kinds:
             # Reduce process impact; as a safe default, lower priority for all user procs

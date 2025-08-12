@@ -2,7 +2,7 @@
 """Initialize the ATL Pubnix database with tables and test data."""
 
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 from database import create_db_and_tables, get_db_session
 from models.user import Application, ApplicationStatus, ResourceLimits, User, UserStatus
@@ -20,7 +20,7 @@ def create_test_data():
                 email="testuser1@example.com",
                 full_name="Test User One",
                 status=UserStatus.APPROVED,
-                approval_date=datetime.utcnow(),
+                approval_date=datetime.now(timezone.utc),
                 home_directory="/home/testuser1",
                 created_by="admin",
             ),
@@ -29,7 +29,7 @@ def create_test_data():
                 email="testuser2@example.com",
                 full_name="Test User Two",
                 status=UserStatus.APPROVED,
-                approval_date=datetime.utcnow(),
+                approval_date=datetime.now(timezone.utc),
                 home_directory="/home/testuser2",
                 created_by="admin",
             ),

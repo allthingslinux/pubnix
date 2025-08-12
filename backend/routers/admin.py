@@ -1,10 +1,11 @@
 """Administrative endpoints for ATL Pubnix."""
+
 from __future__ import annotations
 
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from datetime import datetime, timezone
+from typing import Any, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 from sqlmodel import Session, col, select
 
@@ -14,7 +15,6 @@ from models import (
     ApplicationStatus,
     ResourceLimits,
     SshKey,
-    SystemMetrics,
     User,
     UserStatus,
 )
@@ -37,20 +37,22 @@ class UserResponse(BaseModel):
     approval_date: Optional[datetime]
 
 
-@router.get("/users", response_model=List[UserResponse])
+@router.get("/users", response_model=list[UserResponse])
 async def list_users(
     status_filter: Optional[UserStatus] = Query(None),
     q: Optional[str] = Query(None, description="Search by username/email"),
     limit: int = Query(100, ge=1, le=500),
     session: Session = Depends(get_session),
     admin: str = Depends(get_current_admin_username),
-) -> List[UserResponse]:
+) -> list[UserResponse]:
     query = select(User)
     if status_filter is not None:
         query = query.where(User.status == status_filter)
     if q:
         like = f"%{q}%"
-        query = query.where((col(User.username).like(like)) | (col(User.email).like(like)))
+        query = query.where(
+            (col(User.username).like(like)) | (col(User.email).like(like))
+        )
     query = query.order_by(User.created_at.desc()).limit(limit)
     users = session.exec(query).all()
     return [UserResponse(**u.model_dump()) for u in users]
@@ -71,7 +73,7 @@ async def suspend_user(
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     user.status = UserStatus.SUSPENDED
-    user.updated_at = datetime.utcnow()
+    user.updated_at = datetime.now(timezone.utc)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -90,7 +92,7 @@ async def unsuspend_user(
     if user.status != UserStatus.SUSPENDED:
         raise HTTPException(status_code=400, detail="User is not suspended")
     user.status = UserStatus.APPROVED
-    user.updated_at = datetime.utcnow()
+    user.updated_at = datetime.now(timezone.utc)
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -105,24 +107,26 @@ class LimitsPatch(BaseModel):
     max_login_sessions: Optional[int] = Field(None, ge=1)
 
 
-@router.patch("/users/{user_id}/limits", response_model=Dict[str, Any])
+@router.patch("/users/{user_id}/limits", response_model=dict[str, Any])
 async def update_user_limits(
     user_id: int,
     patch: LimitsPatch,
     session: Session = Depends(get_session),
     admin: str = Depends(get_current_admin_username),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    limits = session.exec(select(ResourceLimits).where(ResourceLimits.user_id == user_id)).first()
+    limits = session.exec(
+        select(ResourceLimits).where(ResourceLimits.user_id == user_id)
+    ).first()
     if limits is None:
         limits = ResourceLimits(user_id=user_id)
 
     for field, value in patch.model_dump(exclude_none=True).items():
         setattr(limits, field, value)
-    limits.updated_at = datetime.utcnow()
+    limits.updated_at = datetime.now(timezone.utc)
 
     session.add(limits)
     session.commit()
@@ -132,8 +136,8 @@ async def update_user_limits(
 
 
 class HealthResponse(BaseModel):
-    system: Dict[str, Any]
-    summary: Dict[str, int]
+    system: dict[str, Any]
+    summary: dict[str, int]
 
 
 @router.get("/health", response_model=HealthResponse)

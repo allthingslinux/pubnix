@@ -1,6 +1,6 @@
 """Unit tests for ATL Pubnix data models."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 import pytest
 from sqlalchemy.pool import StaticPool
@@ -180,7 +180,7 @@ class TestApplication:
         # Approve application
         app.status = ApplicationStatus.APPROVED
         app.reviewed_by = "admin"
-        app.review_date = datetime.utcnow()
+        app.review_date = datetime.now(timezone.utc)
         app.review_notes = "Approved - good motivation"
 
         session.add(app)
@@ -231,7 +231,7 @@ class TestUserMetrics:
             disk_usage_mb=512,
             active_processes=5,
             login_sessions=2,
-            last_activity=datetime.utcnow(),
+            last_activity=datetime.now(timezone.utc),
             web_requests_count=50,
         )
         session.add(metrics)

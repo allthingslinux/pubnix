@@ -1,9 +1,9 @@
 """Structured audit logging for security events."""
+
 from __future__ import annotations
 
-import json
 from datetime import datetime, timezone
-from typing import Any, Dict
+from typing import Any
 
 import structlog
 
@@ -16,7 +16,7 @@ class AuditLogger:
         return datetime.now(timezone.utc).isoformat()
 
     def log(self, event_name: str, **kwargs: Any) -> None:
-        payload: Dict[str, Any] = {"ts": self._now(), "evt": event_name}
+        payload: dict[str, Any] = {"ts": self._now(), "evt": event_name}
         payload.update(kwargs)
         # Emit structured line; in production, route to file/syslog
         self.logger.info("audit", **payload)

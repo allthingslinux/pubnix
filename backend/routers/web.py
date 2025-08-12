@@ -1,4 +1,5 @@
 """Minimal HTML pages for application form and admin review."""
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import HTMLResponse
 from sqlmodel import Session
@@ -10,8 +11,7 @@ router = APIRouter(tags=["web"])
 
 @router.get("/apply", response_class=HTMLResponse)
 async def application_form() -> str:
-    return (
-        """
+    return """
         <html>
           <head><title>ATL Pubnix Application</title></head>
           <body>
@@ -44,14 +44,12 @@ async def application_form() -> str:
           </body>
         </html>
         """
-    )
 
 
 @router.get("/admin/review", response_class=HTMLResponse)
 async def admin_review_page(session: Session = Depends(get_session)) -> str:
     # lightweight page that fetches applications via API
-    return (
-        """
+    return """
         <html>
           <head><title>ATL Pubnix Admin Review</title></head>
           <body>
@@ -84,4 +82,3 @@ async def admin_review_page(session: Session = Depends(get_session)) -> str:
           </body>
         </html>
         """
-    )

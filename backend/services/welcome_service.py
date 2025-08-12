@@ -1,14 +1,14 @@
 """Dynamic welcome messages and system orientation."""
+
 from __future__ import annotations
 
-from datetime import datetime
-from typing import Dict
+from datetime import datetime, timezone
 
 from models import User
 
 
 class WelcomeService:
-    def build_welcome(self, user: User) -> Dict[str, str]:
+    def build_welcome(self, user: User) -> dict[str, str]:
         return {
             "title": "Welcome to ATL Pubnix",
             "message": (
@@ -17,5 +17,5 @@ class WelcomeService:
                 "Web site: ~/public_html\n"
                 "Use SSH keys for login; upload via the web/API.\n"
             ),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }

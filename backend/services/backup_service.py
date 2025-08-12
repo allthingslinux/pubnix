@@ -5,20 +5,22 @@ Creates compressed archives of important paths, encrypts them with Fernet
 checksums, and can verify and restore. Upload step is abstracted to a simple
 filesystem copy to simulate remote storage (e.g., Hetzner Storage Box mount).
 """
+
 from __future__ import annotations
 
 import base64
 import hashlib
 import os
 import tarfile
+from collections.abc import Iterable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Iterable, List, Optional
+from typing import List, Optional
 
+from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from cryptography.fernet import Fernet
 
 
 @dataclass
@@ -61,7 +63,7 @@ class BackupService:
         return Fernet(key).decrypt(token)
 
     def create_archive(self, name_prefix: str, paths: Iterable[Path | str]) -> Path:
-        timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         archive_path = self.backup_dir / f"{name_prefix}_{timestamp}.tar.gz"
         with tarfile.open(archive_path, "w:gz") as tf:
             for p in paths:
@@ -105,7 +107,9 @@ class BackupService:
             dest_files.append(dest)
         return dest_files
 
-    def restore(self, encrypted_path: Path, password: str, target_dir: Path | str) -> Path:
+    def restore(
+        self, encrypted_path: Path, password: str, target_dir: Path | str
+    ) -> Path:
         blob = encrypted_path.read_bytes()
         tar_bytes = self._decrypt_bytes(blob, password)
         temp_tar = encrypted_path.with_suffix(".restore.tmp.tar.gz")
@@ -126,4 +130,6 @@ class BackupService:
         archive = self.create_archive(name_prefix, paths)
         encrypted = self.encrypt_archive(archive, password)
         manifest = self.write_manifest(encrypted)
-        return BackupResult(archive_path=archive, encrypted_path=encrypted, manifest_path=manifest)
+        return BackupResult(
+            archive_path=archive, encrypted_path=encrypted, manifest_path=manifest
+        )

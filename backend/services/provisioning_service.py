@@ -7,6 +7,7 @@ In development and tests, it operates in dry-run mode and never executes
 system commands. In production, it can be configured to execute commands
 via a pluggable runner.
 """
+
 from __future__ import annotations
 
 import os
@@ -69,7 +70,9 @@ class ProvisioningService:
         ]
         return commands
 
-    def provision_user(self, user: User, dry_run: Optional[bool] = None) -> ProvisionResult:
+    def provision_user(
+        self, user: User, dry_run: Optional[bool] = None
+    ) -> ProvisionResult:
         """Provision the given user account on the host system.
 
         In non-production environments, defaults to dry-run (no command execution).

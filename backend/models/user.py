@@ -1,6 +1,6 @@
 """User account and application data models for ATL Pubnix."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
@@ -38,8 +38,8 @@ class ResourceLimits(SQLModel, table=True):
     max_login_sessions: int = Field(
         default=5, description="Maximum concurrent SSH sessions"
     )
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # Relationship back to user
     user: "User" = Relationship(back_populates="resource_limits")
@@ -61,7 +61,9 @@ class User(SQLModel, table=True):
     )
     email: str = Field(unique=True, index=True, description="User email address")
     full_name: str = Field(description="User's full name")
-    application_date: datetime = Field(default_factory=datetime.utcnow)
+    application_date: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     approval_date: Optional[datetime] = Field(default=None)
     status: UserStatus = Field(default=UserStatus.PENDING)
     home_directory: Optional[str] = Field(
@@ -72,8 +74,8 @@ class User(SQLModel, table=True):
     created_by: Optional[str] = Field(
         default=None, description="Admin who created the account"
     )
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     # Relationships
     resource_limits: Optional[ResourceLimits] = Relationship(back_populates="user")
@@ -100,13 +102,15 @@ class Application(SQLModel, table=True):
         default=None, description="Why they want an account"
     )
     community_guidelines_accepted: bool = Field(default=False)
-    application_date: datetime = Field(default_factory=datetime.utcnow)
+    application_date: datetime = Field(
+        default_factory=lambda: datetime.now(timezone.utc)
+    )
     status: ApplicationStatus = Field(default=ApplicationStatus.PENDING)
     reviewed_by: Optional[str] = Field(default=None, description="Admin who reviewed")
     review_date: Optional[datetime] = Field(default=None)
     review_notes: Optional[str] = Field(default=None, description="Admin review notes")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     def __str__(self) -> str:
         return f"Application(email={self.email}, username={self.username_requested}, status={self.status})"
