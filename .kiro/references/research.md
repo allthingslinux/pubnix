@@ -58,6 +58,53 @@ These are consolidated notes from the repos cloned into `.kiro/references/`. Foc
 - webring/, tildes/, where/, www-site, www-site-v2, wiki/: Site scaffolds, static content, security policy pages, wiki structures and templates.
   - Transferable: include security policy and a simple wiki template.
 
+- tilde.tk/: Tilde subdomain project details (Cloudflare Pages hosting, Freenom registrar); manual email-based onboarding; TODOs for automation.
+  - Transferable: if offering subdomains, automate DNS provisioning and onboarding emails.
+
+- tilde/ (Hack Club tilde NixOS config): Flake-based host config, `addusr` script for creating required directories, strict CoC; services limited to static HTTP/Gemini; joining via Slack `#tilde` with SSH key.
+  - Transferable: NixOS flake as an alternative ops stack; ensure `addusr`-like script in our provisioning.
+
+- tildetown_ring/: Python/JS/Prolog web ring for tilde.town with join page.
+  - Transferable: another webring implementation to study for join workflows.
+
+- tilde-social/: Flat-file social network under `~/.social` with CLI `timeline` for feeds, posts, and follows; future roadmap includes replies/boosts/hashtags.
+  - Transferable: consider optional CLI social tooling reading from home dirs; or integrate with our `comm` endpoints.
+
+- tilde.etcskel/: `/etc/skel` contents and contribution model; encourages wiki-driven docs.
+  - Transferable: ship a curated `/etc/skel` with helpful defaults.
+
+- share/: Placeholder for shared assets; no substantive docs here.
+
+- site/ and site/wiki/: tilde.club site source and wiki build flow; contributors submit markdown, `make` builds HTML; signup code reference included.
+  - Transferable: keep site build simple, accept PRs for docs/wiki.
+
+- tilde.club/: Code and utilities for running/managing tilde.club; community ethos and links to story/FAQ; volunteer-led model.
+  - Transferable: emphasize volunteer onboarding and clear contribution channels.
+
+- spsrv/: Spartan protocol server in Go with features: `/~user` support, directory listing, CGI, CONF/TOML config, systemd examples; caution around user CGI security.
+  - Transferable: if offering Spartan/Gemini, consider spsrv; document CGI risks and sandboxing.
+
+- webring/: XXIIVV webring with criteria and circular linking; requires 10+ content pages and a banner; join via PR to `index.html`.
+  - Transferable: adopt quality criteria for our webring.
+
+- tildes/: utilities for tildeverse (e.g., `code` to index user dirs into HTML).
+  - Transferable: provide admin scripts to generate community indices (opt-in).
+
+- where/: rewritten tool (Tcl + SQLite) to geolocate/where listing; caches IPs.
+  - Transferable: pattern for lightweight service with caching.
+
+- www-site/ and www-site-v2/: Dimension.sh website (Hugo in v2).
+  - Transferable: Hugo is a good default for static sites.
+
+- wiki/: Dimension.sh wiki markdown and style guide (WikiLinks, archival links).
+  - Transferable: adopt WikiLinks-style internal linking.
+
+- tildejsongen/: Python tool to generate Tilde Description Protocol `tilde.json`/yaml from INI config; outputs paths, users group id, signup URL, want_users flag.
+  - Transferable: auto-publish our `tilde.json` and `tilde.yaml` to advertise services.
+
+- website/: Project Segfault Svelte site; dev/prod instructions; envs for Ghost CMS and Uptime Kuma; Docker-first deploy.
+  - Transferable: reference for integrating status/news feeds into our public site.
+
 ## Provisioning and user lifecycle
 
 - mkuser (Python CLI):

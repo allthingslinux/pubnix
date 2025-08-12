@@ -177,3 +177,9 @@ coverage/
 # Local development overrides
 docker-compose.override.yml
 local.env
+
+# Ignore references mirror by default, but keep research notes tracked
+.kiro/references/**
+!.kiro/
+!.kiro/references/
+!.kiro/references/research.md
