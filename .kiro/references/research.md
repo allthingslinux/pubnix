@@ -307,6 +307,50 @@ These are consolidated notes from the repos cloned into `.kiro/references/`. Foc
 - website/ (Project Segfault)
   - Integrate status/news feeds if we run a blog/status; else link out.
 
+## Skeleton (`/etc/skel`) deep dive and recommendations
+
+Goals: secure defaults, great first-run UX, and compatibility with userdir (web), Gemini, Gopher, and optional services.
+
+- Directory layout and permissions
+  - `$HOME` (created by useradd): mode 0711 (traversable without listing); owner `user:user`.
+  - `~/.ssh/`: 0700; `authorized_keys`: 0600; optional `config`: 0600 with minimal, non-host-specific examples commented out.
+  - `~/public_html/`: 0755; include `index.html` (simple welcome) and `README.txt` with next steps; CGI folder `~/public_html/cgi-bin/` with 0755, sample script non-executable by default.
+  - `~/public_gemini/`: 0755; `index.gmi` with a few links to docs.
+  - `~/public_gopher/`: 0755; `gophermap` or `index.txt` per server’s expectation.
+  - Optional: `~/bin/` (0755) added to PATH in shell rc; `~/projects/` (0755).
+
+- Default files
+  - `.bashrc`/`.bash_profile` or `.zshrc`: source `/etc/profile`, set `PATH` to include `~/bin`, add helpful aliases (ls -lah, grep --color), and a brief MOTD pointer.
+  - `.profile`: minimal, non-duplicative, to support non-bash logins.
+  - `.plan` and `.project`: 0644 with a template encouraging users to personalize; compatible with `finger`/`efingerd`.
+  - `.hushlogin`: optional to suppress verbose login banners; we recommend keeping MOTD pointers visible initially.
+  - `README_FIRST.txt`: short “first 10 minutes” checklist (upload key, create web page, join IRC/Usenet, where docs live).
+
+- Web userdir and CGI guidance
+  - Ensure nginx userdir config reads from `~/public_html`, and tests enforce security headers and userdir routing.
+  - Include `public_html/README_CGI.txt` explaining security risks; default per-user CGI disabled at server level unless explicitly enabled.
+
+- Gemini and Gopher
+  - Provide minimal `index.gmi` and `gophermap` templates; link to service catalog and rules.
+
+- Mail and forwarding (optional)
+  - If `~/.forward` supported, document carefully; do not ship by default.
+
+- Shell and editor
+  - Offer commented samples in rc files for setting `$EDITOR` (nano/vim) and enabling useful prompt; avoid opinionated themes by default.
+
+- Ansible role implementation
+  - Idempotent tasks to create directories/files with exact modes.
+  - Templated `index.html`, `index.gmi`, `README` files; jinja variables for instance name.
+  - Post-provision hook to fix permissions if users pre-exist.
+
+- Security notes
+  - Enforce home 0711 to allow web traversal but not listing.
+  - `.ssh` strict modes; fail2ban covers sshd; recommend ed25519 keys with `-a 100` in docs.
+
+- Documentation
+  - Link skel templates to `/docs` pages: SSH keys, userdir, Gemini/Gopher, CGI, IRC/Usenet, CoC.
+
 ## Notable references (files skimmed)
 
 - Ansible production patterns: `.kiro/references/ansible/README.md`
