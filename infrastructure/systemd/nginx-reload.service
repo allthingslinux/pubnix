@@ -1,0 +1,7 @@
+[Unit]
+Description=Reload nginx to pick up config changes
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/nginx -t
+ExecStartPost=/bin/systemctl reload nginx

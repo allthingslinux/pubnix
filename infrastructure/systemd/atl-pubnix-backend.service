@@ -1,0 +1,23 @@
+[Unit]
+Description=ATL Pubnix Backend API
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/pubnix/backend.env
+WorkingDirectory=/opt/pubnix/backend
+ExecStart=/opt/pubnix/backend/.venv/bin/uv run uvicorn main:app --host 127.0.0.1 --port 8000 --proxy-headers --log-level info
+Restart=on-failure
+RestartSec=5s
+User=www-data
+Group=www-data
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target
