@@ -43,7 +43,7 @@
   - Write integration tests for SSH authentication and session management
   - _Requirements: 2.1, 2.4, 2.5_
 
-- [ ] 6. Build resource management and monitoring system
+- [x] 6. Build resource management and monitoring system
 
   - Implement disk quota system using Linux quota utilities
   - Create systemd user slice configuration for CPU and memory limits
