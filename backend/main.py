@@ -10,6 +10,7 @@ from database import create_db_and_tables
 from routers import applications, auth
 from routers import web as web_routes
 from routers import ssh_keys
+from routers import comm as comm_routes
 
 
 @asynccontextmanager
@@ -44,6 +45,7 @@ app.include_router(applications.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
 app.include_router(web_routes.router)
 app.include_router(ssh_keys.router, prefix="/api/v1")
+app.include_router(comm_routes.router, prefix="/api/v1")
 
 
 @app.get("/")

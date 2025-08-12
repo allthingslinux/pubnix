@@ -8,6 +8,8 @@ from .user import (
     User,
     UserStatus,
 )
+from .ssh_key import SshKey
+from .comm import Message
 
 __all__ = [
     "User",
@@ -17,4 +19,6 @@ __all__ = [
     "ApplicationStatus",
     "SystemMetrics",
     "UserMetrics",
+    "SshKey",
+    "Message",
 ]
