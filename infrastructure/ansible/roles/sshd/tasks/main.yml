@@ -1,0 +1,19 @@
+---
+- name: Install OpenSSH server
+  apt:
+    name: openssh-server
+    state: present
+    update_cache: yes
+
+- name: Deploy production sshd_config
+  copy:
+    src: ../../../config/ssh/sshd_config_prod
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart ssh
+  service:
+    name: ssh
+    state: restarted

@@ -1,0 +1,30 @@
+---
+- name: Install base packages
+  apt:
+    name:
+      - fail2ban
+      - apparmor
+      - fcgiwrap
+    state: present
+    update_cache: yes
+
+- name: Deploy Fail2Ban jail
+  copy:
+    src: ../../../config/security/fail2ban/jail.local
+    dest: /etc/fail2ban/jail.local
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Deploy AppArmor profile for fcgiwrap
+  copy:
+    src: ../../../config/apparmor/usr.bin.fcgiwrap
+    dest: /etc/apparmor.d/usr.bin.fcgiwrap
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Restart services
+  service:
+    name: fail2ban
+    state: restarted

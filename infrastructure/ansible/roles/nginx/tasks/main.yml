@@ -1,0 +1,22 @@
+---
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+
+- name: Enable userdir site
+  copy:
+    src: ../../../config/nginx/sites-available/pubnix-dev
+    dest: /etc/nginx/sites-available/pubnix
+
+- name: Symlink site
+  file:
+    src: /etc/nginx/sites-available/pubnix
+    dest: /etc/nginx/sites-enabled/pubnix
+    state: link
+
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted

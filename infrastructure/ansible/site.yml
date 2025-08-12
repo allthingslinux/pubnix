@@ -1,0 +1,10 @@
+---
+- hosts: pubnix
+  become: yes
+  vars:
+    pubnix_env: production
+  roles:
+    - role: common
+    - role: sshd
+    - role: nginx
+    - role: pubnix
