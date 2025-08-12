@@ -1,0 +1,99 @@
+FROM debian:bookworm-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    openssh-server \
+    python3 \
+    python3-pip \
+    python3-venv \
+    nginx \
+    git \
+    curl \
+    wget \
+    vim \
+    nano \
+    emacs-nox \
+    build-essential \
+    gcc \
+    g++ \
+    make \
+    cmake \
+    nodejs \
+    npm \
+    golang-go \
+    rustc \
+    cargo \
+    sqlite3 \
+    postgresql-client \
+    redis-tools \
+    htop \
+    tmux \
+    screen \
+    tree \
+    less \
+    man-db \
+    manpages \
+    manpages-dev \
+    quota \
+    systemd \
+    systemd-sysv \
+    fail2ban \
+    apparmor \
+    apparmor-utils \
+    sudo \
+    cron \
+    rsyslog \
+    logrotate \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create pubnix system user
+RUN useradd -r -s /bin/bash -d /opt/pubnix -m pubnix
+
+# Set up SSH
+RUN mkdir /var/run/sshd
+COPY config/ssh/sshd_config_dev /etc/ssh/sshd_config
+RUN ssh-keygen -A
+
+# Set up nginx
+COPY config/nginx/nginx_dev.conf /etc/nginx/nginx.conf
+COPY config/nginx/sites-available/pubnix-dev /etc/nginx/sites-available/default
+
+# Create application directories
+RUN mkdir -p /opt/pubnix/{backend,web,scripts,config,docs,logs}
+RUN chown -R pubnix:pubnix /opt/pubnix
+
+# Set up Python environment
+WORKDIR /opt/pubnix/backend
+COPY backend/requirements.txt .
+RUN python3 -m venv venv && \
+    . venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Set up systemd (required for user slices and resource management)
+RUN systemctl enable ssh nginx
+
+# Create development user accounts
+RUN useradd -m -s /bin/bash -G sudo testuser1 && \
+    echo "testuser1:testpass" | chpasswd && \
+    mkdir -p /home/testuser1/.ssh /home/testuser1/public_html
+
+RUN useradd -m -s /bin/bash testuser2 && \
+    echo "testuser2:testpass" | chpasswd && \
+    mkdir -p /home/testuser2/.ssh /home/testuser2/public_html
+
+# Set up development SSH keys
+COPY docker/development/keys/dev_host_key /etc/ssh/ssh_host_rsa_key
+COPY docker/development/keys/dev_host_key.pub /etc/ssh/ssh_host_rsa_key.pub
+RUN chmod 600 /etc/ssh/ssh_host_rsa_key
+RUN chmod 644 /etc/ssh/ssh_host_rsa_key.pub
+
+# Copy startup script
+COPY docker/development/start-dev.sh /start-dev.sh
+RUN chmod +x /start-dev.sh
+
+# Expose ports
+EXPOSE 22 80 443
+
+# Set up entrypoint
+ENTRYPOINT ["/start-dev.sh"]

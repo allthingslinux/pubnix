@@ -1,0 +1,7 @@
+# Include development requirements for testing
+-r requirements-dev.txt
+
+# Additional testing utilities
+factory-boy==3.3.0
+faker==20.1.0
+responses==0.24.1

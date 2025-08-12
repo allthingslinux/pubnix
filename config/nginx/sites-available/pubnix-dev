@@ -1,0 +1,67 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    server_name localhost atl-pubnix-dev;
+    root /var/www/html;
+    index index.html index.htm;
+
+    # API proxy to backend
+    location /api/ {
+        proxy_pass http://localhost:8000/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # User web directories
+    location ~ ^/~(.+?)(/.*)?$ {
+        alias /home/$1/public_html$2;
+        index index.html index.htm;
+        autoindex on;
+        
+        # Basic security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        
+        # CGI support for development
+        location ~ \.cgi$ {
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $request_filename;
+            fastcgi_pass unix:/var/run/fcgiwrap.socket;
+        }
+    }
+
+    # Static assets
+    location /static/ {
+        alias /opt/pubnix/web/dist/;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Main web interface
+    location / {
+        try_files $uri $uri/ @frontend;
+    }
+
+    # Frontend fallback for SPA routing
+    location @frontend {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # WebSocket support for development
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    # Security headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+}

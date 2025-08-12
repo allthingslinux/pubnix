@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  pubnix-dev:
+    build:
+      context: ../../
+      dockerfile: docker/development/Dockerfile.pubnix
+    container_name: atl-pubnix-dev
+    hostname: atl-pubnix-dev
+    ports:
+      - "2222:22"    # SSH access
+      - "8080:80"    # Web interface
+      - "8443:443"   # HTTPS (development)
+    volumes:
+      - ../../backend:/opt/pubnix/backend
+      - ../../web:/opt/pubnix/web
+      - ../../scripts:/opt/pubnix/scripts
+      - ../../config:/opt/pubnix/config
+      - ../../docs:/opt/pubnix/docs
+      - pubnix_home:/home
+      - pubnix_var:/var/log/pubnix
+    environment:
+      - PUBNIX_ENV=development
+      - PUBNIX_DEBUG=true
+      - PUBNIX_LOG_LEVEL=DEBUG
+    networks:
+      - pubnix-net
+    privileged: true  # Required for user management and systemd
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  database:
+    image: postgres:15-alpine
+    container_name: atl-pubnix-db-dev
+    environment:
+      - POSTGRES_DB=pubnix_dev
+      - POSTGRES_USER=pubnix
+      - POSTGRES_PASSWORD=dev_password_change_in_production
+    ports:
+      - "5432:5432"
+    volumes:
+      - pubnix_db:/var/lib/postgresql/data
+      - ../../scripts/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - pubnix-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: atl-pubnix-redis-dev
+    ports:
+      - "6379:6379"
+    volumes:
+      - pubnix_redis:/data
+    networks:
+      - pubnix-net
+
+  web-dev:
+    build:
+      context: ../../web
+      dockerfile: ../docker/development/Dockerfile.web
+    container_name: atl-pubnix-web-dev
+    ports:
+      - "3000:3000"  # Development server
+    volumes:
+      - ../../web:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8080/api
+    networks:
+      - pubnix-net
+    depends_on:
+      - pubnix-dev
+
+volumes:
+  pubnix_home:
+  pubnix_var:
+  pubnix_db:
+  pubnix_redis:
+
+networks:
+  pubnix-net:
+    driver: bridge

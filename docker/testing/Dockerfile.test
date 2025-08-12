@@ -1,0 +1,35 @@
+FROM debian:bookworm-slim
+
+# Install minimal dependencies for testing
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    postgresql-client \
+    sqlite3 \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create test environment
+RUN useradd -r -s /bin/bash -d /opt/pubnix -m pubnix
+WORKDIR /opt/pubnix
+
+# Copy source code
+COPY backend/ backend/
+COPY tests/ tests/
+COPY scripts/ scripts/
+
+# Set up Python environment with test dependencies
+WORKDIR /opt/pubnix/backend
+RUN python3 -m venv venv && \
+    . venv/bin/activate && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    pip install -r requirements-test.txt
+
+# Set up test results directory
+RUN mkdir -p /opt/pubnix/test-results
+RUN chown -R pubnix:pubnix /opt/pubnix
+
+USER pubnix
+WORKDIR /opt/pubnix

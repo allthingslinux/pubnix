@@ -1,0 +1,82 @@
+name: Security Scanning
+
+on:
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  dependency-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install Python dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install safety bandit
+        pip install -r requirements.txt
+    
+    - name: Run Python security scan
+      run: |
+        cd backend
+        safety check --json --output safety-report.json || true
+        bandit -r . -f json -o bandit-report.json || true
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install Node.js dependencies
+      run: |
+        cd web
+        npm ci
+    
+    - name: Run Node.js security audit
+      run: |
+        cd web
+        npm audit --audit-level=moderate --json > npm-audit.json || true
+
+  secrets-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Run GitLeaks scan
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  container-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build Docker images
+      run: |
+        docker-compose -f docker/development/docker-compose.yml build
+    
+    - name: Scan Docker images
+      run: |
+        # Scan all built images for vulnerabilities
+        for image in $(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "^(atl-pubnix|pubnix)"); do
+          echo "Scanning $image"
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+            aquasec/trivy:latest image --exit-code 1 --severity HIGH,CRITICAL $image
+        done
