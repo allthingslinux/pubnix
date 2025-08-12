@@ -40,6 +40,12 @@ server {
         add_header Cache-Control "public, immutable";
     }
 
+    # Landing page
+    location = /landing {
+        alias /opt/pubnix/web/landing/index.html;
+        default_type text/html;
+    }
+
     # Main web interface
     location / {
         try_files $uri $uri/ @frontend;
