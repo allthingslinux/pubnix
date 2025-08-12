@@ -13,6 +13,7 @@ from routers import ssh_keys
 from routers import comm as comm_routes
 from routers import admin as admin_routes
 from routers import integrations as integrations_routes
+from routers import monitoring as monitoring_routes
 
 
 @asynccontextmanager
@@ -50,6 +51,7 @@ app.include_router(ssh_keys.router, prefix="/api/v1")
 app.include_router(comm_routes.router, prefix="/api/v1")
 app.include_router(admin_routes.router, prefix="/api/v1")
 app.include_router(integrations_routes.router, prefix="/api/v1")
+app.include_router(monitoring_routes.router, prefix="/api/v1")
 
 
 @app.get("/")
