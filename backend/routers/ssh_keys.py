@@ -10,6 +10,7 @@ from sqlmodel import Session, select
 from database import get_session
 from models import SshKey, User
 from services.ssh_key_service import SshKeyService
+from services.audit_logger import AuditLogger
 
 router = APIRouter(prefix="/ssh-keys", tags=["ssh-keys"])
 
@@ -33,6 +34,7 @@ class SshKeyResponse(BaseModel):
 async def add_ssh_key(
     key_data: SshKeyCreate, session: Session = Depends(get_session)
 ) -> SshKeyResponse:
+    auditor = AuditLogger()
     # Ensure user exists
     user = session.exec(select(User).where(User.username == key_data.username)).first()
     if not user:
@@ -66,6 +68,14 @@ async def add_ssh_key(
     session.commit()
     session.refresh(key)
 
+    auditor.log(
+        "ssh_key_added",
+        username=user.username,
+        key_id=key.id,
+        fingerprint=key.fingerprint,
+        name=key.name,
+    )
+
     return SshKeyResponse(**key.model_dump())
 
 
@@ -88,6 +98,7 @@ async def list_ssh_keys(
 async def deactivate_ssh_key(
     key_id: int, session: Session = Depends(get_session)
 ) -> SshKeyResponse:
+    auditor = AuditLogger()
     key = session.get(SshKey, key_id)
     if not key:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Key not found")
@@ -95,6 +106,7 @@ async def deactivate_ssh_key(
     session.add(key)
     session.commit()
     session.refresh(key)
+    auditor.log("ssh_key_deactivated", key_id=key.id, fingerprint=key.fingerprint)
     return SshKeyResponse(**key.model_dump())
 
 
@@ -102,9 +114,11 @@ async def deactivate_ssh_key(
 async def delete_ssh_key(
     key_id: int, session: Session = Depends(get_session)
 ) -> Response:
+    auditor = AuditLogger()
     key = session.get(SshKey, key_id)
     if not key:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Key not found")
     session.delete(key)
     session.commit()
+    auditor.log("ssh_key_deleted", key_id=key_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

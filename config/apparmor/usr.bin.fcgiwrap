@@ -1,0 +1,23 @@
+# AppArmor profile for fcgiwrap limiting CGI execution
+#include <tunables/global>
+
+/usr/bin/fcgiwrap {
+  #include <abstractions/base>
+  #include <abstractions/nameservice>
+
+  capability net_bind_service,
+  capability setgid,
+  capability setuid,
+
+  /usr/bin/fcgiwrap mr,
+  /usr/sbin/fcgiwrap mr,
+
+  /home/**/public_html/** r,
+  /tmp/** rw,
+
+  # Deny dangerous paths
+  deny /etc/** r,
+  deny /var/** rw,
+  deny /proc/** r,
+  deny /sys/** r,
+}

@@ -1,0 +1,23 @@
+# Fail2Ban local jail configuration for ATL Pubnix
+
+[DEFAULT]
+bantime = 1h
+findtime = 10m
+maxretry = 5
+
+backend = systemd
+banaction = iptables-multiport
+
+[sshd]
+enabled = true
+port    = 22
+filter  = sshd
+logpath = /var/log/auth.log
+maxretry = 5
+
+# Optional: nginx auth abuse
+[nginx-auth]
+enabled = true
+filter  = nginx-http-auth
+logpath = /var/log/nginx/error.log
+maxretry = 5
