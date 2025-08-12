@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     sqlite3 \
     git \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Create test environment
@@ -18,18 +19,27 @@ WORKDIR /opt/pubnix
 COPY backend/ backend/
 COPY tests/ tests/
 COPY scripts/ scripts/
+COPY docs/ docs/
+COPY config/ config/
+COPY infrastructure/ infrastructure/
+COPY web/ web/
 
-# Set up Python environment with test dependencies
+# Set up Python environment with uv using pyproject
 WORKDIR /opt/pubnix/backend
-RUN python3 -m venv venv && \
-    . venv/bin/activate && \
-    pip install --upgrade pip && \
-    pip install -r requirements.txt && \
-    pip install -r requirements-test.txt
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    cp /root/.local/bin/uv /usr/local/bin/uv && \
+    cp /root/.local/bin/uvx /usr/local/bin/uvx && \
+    chmod 755 /usr/local/bin/uv /usr/local/bin/uvx
+COPY backend/pyproject.toml backend/uv.lock backend/README.md ./
 
-# Set up test results directory
-RUN mkdir -p /opt/pubnix/test-results
-RUN chown -R pubnix:pubnix /opt/pubnix
+# Set up test results directory and permissions
+RUN mkdir -p /opt/pubnix/test-results && \
+    chown -R pubnix:pubnix /opt/pubnix
 
+# Create the virtual environment as the non-root user to avoid permission issues
 USER pubnix
+WORKDIR /opt/pubnix/backend
+RUN uv venv --python /usr/bin/python3 && \
+    uv sync --group dev
+
 WORKDIR /opt/pubnix

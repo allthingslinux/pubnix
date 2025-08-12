@@ -1,4 +1,4 @@
-version: '3.8'
+# docker compose v2 (version key omitted)
 
 services:
   pubnix-test:
@@ -11,11 +11,11 @@ services:
       - PUBNIX_DEBUG=false
       - PUBNIX_LOG_LEVEL=INFO
     volumes:
-      - ../../tests:/opt/pubnix/tests
       - test_results:/opt/pubnix/test-results
     networks:
       - pubnix-test-net
-    command: ["python", "-m", "pytest", "tests/", "-v", "--junitxml=/opt/pubnix/test-results/junit.xml"]
+    working_dir: /opt/pubnix/backend
+    command: ["uv", "run", "pytest", "-v", "--junitxml=/opt/pubnix/test-results/junit.xml"]
 
   test-db:
     image: postgres:15-alpine
