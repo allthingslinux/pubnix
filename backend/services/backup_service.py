@@ -117,7 +117,9 @@ class BackupService:
         target = Path(target_dir)
         target.mkdir(parents=True, exist_ok=True)
         with tarfile.open(temp_tar, "r:gz") as tf:
-            tf.extractall(path=target)
+            # Use safe extraction filter to avoid deprecation warnings and
+            # protect against path traversal or special files.
+            tf.extractall(path=target, filter="data")
         temp_tar.unlink(missing_ok=True)
         return target
 
