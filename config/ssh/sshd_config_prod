@@ -1,0 +1,50 @@
+# ATL Pubnix SSH Configuration - Production (hardened)
+
+Port 22
+Protocol 2
+
+# Host keys
+HostKey /etc/ssh/ssh_host_ed25519_key
+HostKey /etc/ssh/ssh_host_rsa_key
+
+# Logging (verbose for auditing)
+SyslogFacility AUTHPRIV
+LogLevel VERBOSE
+
+# Authentication - key-only
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+ChallengeResponseAuthentication no
+PermitEmptyPasswords no
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+
+# Root login disabled
+PermitRootLogin no
+
+# Strict modes and limits
+StrictModes yes
+MaxAuthTries 4
+MaxSessions 4
+MaxStartups 10:30:100
+
+# Timeouts
+LoginGraceTime 45
+ClientAliveInterval 120
+ClientAliveCountMax 2
+
+# PAM and environment
+UsePAM yes
+AcceptEnv LANG LC_*
+
+# SFTP subsystem
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# Optional: restrict forwarding by default (uncomment to enforce)
+# AllowAgentForwarding no
+# AllowTcpForwarding no
+# X11Forwarding no
+
+# Banner and MOTD handled by application layer
+PrintMotd no
+PrintLastLog yes
