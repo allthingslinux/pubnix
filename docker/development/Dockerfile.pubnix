@@ -62,16 +62,17 @@ COPY config/nginx/sites-available/pubnix-dev /etc/nginx/sites-available/default
 RUN mkdir -p /opt/pubnix/{backend,web,scripts,config,docs,logs}
 RUN chown -R pubnix:pubnix /opt/pubnix
 
-# Set up Python environment
+# Set up Python environment using uv and pyproject
 WORKDIR /opt/pubnix/backend
-COPY backend/requirements.txt .
-RUN python3 -m venv venv && \
-    . venv/bin/activate && \
-    pip install --upgrade pip && \
-    pip install -r requirements.txt
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
+    ln -s /root/.local/bin/uv /usr/local/bin/uv
+COPY backend/pyproject.toml backend/README.md backend/uv.lock ./
+RUN uv venv && \
+    . .venv/bin/activate && \
+    uv sync
 
-# Set up systemd (required for user slices and resource management)
-RUN systemctl enable ssh nginx
+# Set up systemd (pre-enable units if possible; don't fail in container)
+RUN systemctl enable ssh nginx || true
 
 # Create development user accounts
 RUN useradd -m -s /bin/bash -G sudo testuser1 && \

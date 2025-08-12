@@ -1,4 +1,4 @@
-version: '3.8'
+# docker compose v2 (version key omitted)
 
 services:
   pubnix-dev:
@@ -30,8 +30,8 @@ services:
       - /tmp
       - /run
       - /run/lock
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    # extra mounts for systemd
+    extra_hosts: []
 
   database:
     image: postgres:15-alpine
