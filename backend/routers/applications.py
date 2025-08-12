@@ -11,6 +11,7 @@ from database import get_session
 from models import Application, ApplicationStatus, User, UserStatus, ResourceLimits
 from services.email_service import EmailService
 from services.validation_service import ValidationService
+from services.provisioning_service import ProvisioningService
 
 router = APIRouter(prefix="/applications", tags=["applications"])
 
@@ -258,5 +259,11 @@ async def review_application(
             limits = ResourceLimits(user_id=user.id)
             session.add(limits)
             session.commit()
+
+            # Trigger provisioning (dry-run in non-production)
+            provisioning_service = ProvisioningService()
+            provisioning_result = provisioning_service.provision_user(user)
+            # For now, we do not fail the API if provisioning fails; this will be
+            # handled by background tasks/retries in a future iteration.
     
     return ApplicationResponse.model_validate(application, from_attributes=True)
