@@ -1,19 +1,18 @@
 """Main FastAPI application for ATL Pubnix backend services."""
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import create_db_and_tables
-from routers import applications, auth
-from routers import web as web_routes
-from routers import ssh_keys
-from routers import comm as comm_routes
 from routers import admin as admin_routes
+from routers import applications, auth, ssh_keys
+from routers import comm as comm_routes
 from routers import integrations as integrations_routes
 from routers import monitoring as monitoring_routes
+from routers import web as web_routes
 
 
 @asynccontextmanager
@@ -68,7 +67,7 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     uvicorn.run(
         "main:app",
         host="0.0.0.0",

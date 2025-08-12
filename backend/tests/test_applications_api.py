@@ -1,5 +1,4 @@
-from datetime import datetime
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,7 +14,9 @@ from routers import applications as applications_router
 @pytest.fixture
 def engine():
     engine = create_engine(
-        "sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
     SQLModel.metadata.create_all(engine)
     return engine
@@ -102,8 +103,13 @@ def test_review_approve_creates_user(session):
     created = client.post("/api/v1/applications/", json=payload).json()
 
     # Approve
-    review_payload = {"status": ApplicationStatus.APPROVED, "review_notes": "Looks good"}
-    resp = client.patch(f"/api/v1/applications/{created['id']}/review", json=review_payload)
+    review_payload = {
+        "status": ApplicationStatus.APPROVED,
+        "review_notes": "Looks good",
+    }
+    resp = client.patch(
+        f"/api/v1/applications/{created['id']}/review", json=review_payload
+    )
     assert resp.status_code == 200, resp.text
     data = resp.json()
     assert data["status"] == ApplicationStatus.APPROVED
@@ -112,7 +118,7 @@ def test_review_approve_creates_user(session):
     from sqlmodel import select
 
     user = session.exec(
-        select(User).where(User.username == payload["username_requested"])  
+        select(User).where(User.username == payload["username_requested"])
     ).first()
 
     assert user is not None

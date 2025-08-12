@@ -1,4 +1,4 @@
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,7 +13,9 @@ from models import Application, ApplicationStatus, ResourceLimits, User, UserSta
 @pytest.fixture
 def engine():
     engine = create_engine(
-        "sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
     SQLModel.metadata.create_all(engine)
     return engine
@@ -36,16 +38,38 @@ def override_dependencies(session):
 
 
 def seed_data(session: Session):
-    u1 = User(username="u1", email="u1@example.com", full_name="U One", status=UserStatus.APPROVED)
-    u2 = User(username="u2", email="u2@example.com", full_name="U Two", status=UserStatus.SUSPENDED)
-    u3 = User(username="u3", email="u3@example.com", full_name="U Three", status=UserStatus.PENDING)
+    u1 = User(
+        username="u1",
+        email="u1@example.com",
+        full_name="U One",
+        status=UserStatus.APPROVED,
+    )
+    u2 = User(
+        username="u2",
+        email="u2@example.com",
+        full_name="U Two",
+        status=UserStatus.SUSPENDED,
+    )
+    u3 = User(
+        username="u3",
+        email="u3@example.com",
+        full_name="U Three",
+        status=UserStatus.PENDING,
+    )
     session.add(u1)
     session.add(u2)
     session.add(u3)
     session.commit()
     session.refresh(u1)
     session.add(ResourceLimits(user_id=u1.id))
-    session.add(Application(email="a@example.com", username_requested="new", full_name="New", status=ApplicationStatus.PENDING))
+    session.add(
+        Application(
+            email="a@example.com",
+            username_requested="new",
+            full_name="New",
+            status=ApplicationStatus.PENDING,
+        )
+    )
     session.commit()
 
 
@@ -71,7 +95,9 @@ def test_list_users_suspend_unsuspend_limits_and_health(session):
     assert resp.json()["status"] == "approved"
 
     # Update limits
-    resp = client.patch(f"/api/v1/admin/users/{uid}/limits", json={"disk_quota_mb": 2048})
+    resp = client.patch(
+        f"/api/v1/admin/users/{uid}/limits", json={"disk_quota_mb": 2048}
+    )
     assert resp.status_code == 200
     assert resp.json()["limits"]["disk_quota_mb"] == 2048
 

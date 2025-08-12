@@ -1,4 +1,4 @@
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -12,7 +12,9 @@ from database import get_session as prod_get_session
 @pytest.fixture
 def engine():
     engine = create_engine(
-        "sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
     SQLModel.metadata.create_all(engine)
     return engine
@@ -38,7 +40,9 @@ def test_send_and_list_inbox(session):
     client = TestClient(main.app)
 
     # Send wall message
-    resp = client.post("/api/v1/comm/send", json={"from_user": "alice", "content": "Hello all!"})
+    resp = client.post(
+        "/api/v1/comm/send", json={"from_user": "alice", "content": "Hello all!"}
+    )
     assert resp.status_code == 201
 
     # Send direct message

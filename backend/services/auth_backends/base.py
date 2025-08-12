@@ -1,4 +1,5 @@
 """Authentication backend interfaces for future integrations (LDAP/SSO)."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

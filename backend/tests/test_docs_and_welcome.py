@@ -1,6 +1,7 @@
+from pathlib import Path
+
 from models import User
 from services.welcome_service import WelcomeService
-from pathlib import Path
 
 
 def test_docs_files_exist():

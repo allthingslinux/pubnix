@@ -1,5 +1,4 @@
-import os
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
@@ -13,7 +12,9 @@ from database import get_session as prod_get_session
 @pytest.fixture
 def engine():
     engine = create_engine(
-        "sqlite:///:memory:", connect_args={"check_same_thread": False}, poolclass=StaticPool
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
     )
     SQLModel.metadata.create_all(engine)
     return engine
@@ -46,7 +47,9 @@ def test_import_export_users(session):
         {"username": "ext1", "email": "e1@example.com", "full_name": "Ext One"},
         {"username": "ext2", "email": "e2@example.com", "full_name": "Ext Two"},
     ]
-    resp = client.post("/api/v1/integrations/users/import", json=payload, headers=headers)
+    resp = client.post(
+        "/api/v1/integrations/users/import", json=payload, headers=headers
+    )
     assert resp.status_code == 200, resp.text
     assert resp.json()["created"] == 2
 

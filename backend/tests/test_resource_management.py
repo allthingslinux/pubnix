@@ -1,5 +1,5 @@
-from services.resource_enforcer import ResourceEnforcer, Violation
 from models import ResourceLimits, UserMetrics
+from services.resource_enforcer import ResourceEnforcer, Violation
 
 
 def test_detects_violations():
