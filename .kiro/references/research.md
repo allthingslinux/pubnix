@@ -172,6 +172,141 @@ These are consolidated notes from the repos cloned into `.kiro/references/`. Foc
 - Admin playbooks with tags for `ssh`, `quotas`, `nginx-userdir`, `fail2ban`, `backups`.
 - Publish a Service Catalog page with links and status, backed by our `/monitoring` endpoint.
 
+## Recommended roadmap (synthesis)
+
+- Gemini and Gopher hosting
+  - What: Offer `~/public_gemini` via Molly-Brown and `~/public_gopher` via Gophernicus; expose `gemini://` and `gopher://` endpoints.
+  - Why: Core tilde experience widely offered by peers.
+  - How: New Ansible roles (`gemini`, `gopher`) + nginx/Caddy fronting if needed; add docs, tests asserting directory mapping and service health.
+
+- Pre/post provisioning hooks
+  - What: Honor `/etc/pubnix/pre.d` and `/etc/pubnix/post.d` executable hooks in `ProvisioningService`.
+  - Why: Operator extensibility without code changes (mkuser pattern).
+  - How: Discover and execute hooks with clear env contract (username, uid, home), strict timeouts, logs, and exit-code handling.
+
+- Public signup endpoint + Matrix notifications
+  - What: `POST /public/signup {username,email,ssh}` that creates an `Application`, rate-limits, and notifies moderators via Matrix + email.
+  - Why: Mirrors PublAPI; speeds operator response.
+  - How: Add `MatrixNotifier` service; support Shoutrrr-like webhook fallback; optional IP allowlist.
+
+- Webring helper and policy
+  - What: Maintain `webring/members.json`, expose prev/next API, provide an HTML/JS widget snippet; adopt XXIIVV criteria incl. 88×31 banner.
+  - Why: Community discovery with consistent UX.
+  - How: CLI to validate entries; CI to build a static page; moderation workflow via PRs.
+
+- tilde.json + yaml generation
+  - What: Publish `/.well-known/tilde.json` and `/tilde.yaml` nightly.
+  - Why: Interop and discovery across tildeverse.
+  - How: Generate from config (name, url, signup_url, want_users, admin_email, paths) and deploy; add tests for endpoint presence.
+
+- Domain/SSL expiry watcher
+  - What: Monitor WHOIS expiry, ACME certificate expiry, and DNS health; export Prometheus metrics.
+  - Why: Reduce outages; alert early.
+  - How: Cron/systemd timer calling a watcher; push metrics and Matrix alerts.
+
+- Harden `/etc/skel` + first-10-minutes docs
+  - What: Ship curated skel (shell rc, `.plan`, `public_html` templates) and clear onboarding docs (SSH keys, `~user` web, CGI, IRC/Usenet).
+  - Why: Smoother onboarding; consistent defaults.
+  - How: Ansible role to install skel; docs under `/docs`, linked from MOTD and web.
+
+- Optional Spartan server (spsrv)
+  - What: Provide Spartan service with `~user` mapping; user CGI disabled by default.
+  - Why: Complements Gemini/Gopher for enthusiasts.
+  - How: Package and document; make opt-in via Ansible tag/var; note CGI risks.
+
+- Backups with Borg/Borgmatic
+  - What: Standard, robust backups for pubnix data.
+  - Why: Widely used in peers; reliable.
+  - How: Ansible role; integrate with our backup manifest and `/monitoring` health endpoint.
+
+- Harden nginx userdir + headers
+  - What: Ensure HSTS, content-type options, referrer policy, rate limits; secure userdir.
+  - Why: Baseline hardening across sites.
+  - How: Adopt best snippets from `pubnix-configs`; extend tests to assert HSTS.
+
+## Per-repo deep dive and actionable items
+
+- ansible/
+  - Adopt roles: `borgmatic`, `certbot`, `cis` (subset), `efingerd`, `gemini`, `gopher`, `news`, `postfix`, `shell`, `www`.
+  - Tag scheme: `base, ssh, quotas, userdir, mail, backups, services`.
+  - Secrets: Vault for global/per-host; document operator flow.
+
+- astral.social/, infra-2/
+  - Separate public site vs ops repo; keep `pubnix/` automation isolated.
+  - Consider Caddy+Geo/Tor only if we add multi-region.
+
+- bb/
+  - Package optional TUI bulletin board storing per-user data; aggregate read-only across users.
+  - Bridge to our `comm` API for web/mobile listing.
+
+- cosmic/
+  - CI hygiene; no direct adoption.
+
+- makeuser/ and mkuser/
+  - Provide `pubnix-admin` CLI wrapping provisioning user creation.
+  - Implement pre/post hooks with env contract.
+
+- meta-ring/ and webring/
+  - JSON members, static build, PR-based joins, clear quality criteria.
+  - Provide validator CLI and PR template.
+
+- publapi/
+  - Implement minimal `POST /public/signup`; integrate Matrix/email; rate limit and optional IP allowlist.
+
+- pubnix-configs/
+  - Pull nginx hardening snippets and align with tests for HSTS/security headers.
+
+- pubnix-domain-watcher/
+  - Build a watcher for domains/certs; export metrics; add Matrix alerts.
+
+- pubnix-site/
+  - Optional Fresh/Deno site; otherwise keep current static site.
+
+- Segfautils/
+  - Microservice pattern for contact admin form; could be replaced by backend endpoint + Matrix relay.
+
+- SF-UI/
+  - Consider browser terminal for guided onboarding (sandboxed); otherwise defer.
+
+- tilde.tk/
+  - Automate subdomain provisioning (Cloudflare API), outbound mail verification policy, SPF/DMARC.
+
+- tilde (Hack Club)
+  - `addusr` behavior: ensure user provisioning creates `public_html`, `public_gmi`, `public_gopher` with templates; enforce CoC in docs.
+
+- tildetown_ring/
+  - Study join UX; support PR + form-to-PR workflow.
+
+- tilde-social/
+  - Optional CLI `timeline` leveraging `~/.social`; optionally sync to `comm` endpoints.
+
+- tilde.etcskel/
+  - Curate `/etc/skel` for friendly defaults; include `.ssh/config` sample, `.plan`.
+
+- site/ and site/wiki/
+  - Build contributor wiki; ship SSH/2FA/IRC/Usenet/CGI/editor guides; `make` build flow.
+
+- tilde.club/
+  - Codify ethos and volunteer onboarding in docs; contribute paths clear.
+
+- spsrv/
+  - Offer Spartan as opt-in; default user CGI off; document sandboxing.
+
+- tildes/
+  - Implement opt-in community indexers (e.g., `~/bin`, `~/projects`) generating a shared page.
+
+- where/
+  - Consider an opt-in location page with caching; privacy-first defaults.
+
+- www-site, www-site-v2, wiki/
+  - Hugo for public site; wiki with WikiLinks; promote archived external links.
+
+- tildejsongen/
+  - Generate/publish `tilde.json` and YAML nightly; tests and CI.
+
+- website/ (Project Segfault)
+  - Integrate status/news feeds if we run a blog/status; else link out.
+
 ## Notable references (files skimmed)
 
 - Ansible production patterns: `.kiro/references/ansible/README.md`
