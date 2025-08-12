@@ -7,7 +7,7 @@
     group: root
     mode: "0755"
 
-- name: Create default directories under /etc/skel
+- name: Sync physical skel from repo (directories)
   file:
     path: "/etc/skel/{{ item }}"
     state: directory
@@ -31,113 +31,75 @@
 
 - name: Place README_FIRST.txt
   copy:
+    src: ../../../config/skel/README_FIRST.txt
     dest: /etc/skel/README_FIRST.txt
     owner: root
     group: root
     mode: "0644"
-    content: |
-      Welcome to ATL Pubnix!
-
-      First 10 minutes checklist:
-      - Publish a page at ~/public_html/index.html
-      - Explore Gemini (~/public_gemini/index.gmi) and Gopher (~/public_gopher/gophermap)
-      - Join community chat and read the Code of Conduct
-      - Read docs at /docs
 
 - name: Place .plan and .project templates
   copy:
+    src: "../../../config/skel/{{ item }}"
     dest: "/etc/skel/{{ item }}"
     owner: root
     group: root
     mode: "0644"
-    content: |
-      Describe yourself or your current project here.
   loop:
     - .plan
     - .project
 
 - name: Place default index.html
   copy:
+    src: ../../../config/skel/public_html/index.html
     dest: /etc/skel/public_html/index.html
     owner: root
     group: root
     mode: "0644"
-    content: |
-      <!doctype html>
-      <meta charset="utf-8" />
-      <title>ATL Pubnix — Welcome</title>
-      <h1>Welcome!</h1>
-      <p>Your web space is live at <code>https://HOST/~USERNAME/</code>.</p>
-      <p>Edit <code>~/public_html/index.html</code> to replace this page.</p>
 
 - name: Place CGI README
   copy:
+    src: ../../../config/skel/public_html/README_CGI.txt
     dest: /etc/skel/public_html/README_CGI.txt
     owner: root
     group: root
     mode: "0644"
-    content: |
-      Per-user CGI is disabled by default for security. If enabled by admins,
-      use ~/public_html/cgi-bin for scripts. Keep in mind execution risks and
-      never store secrets in world-readable locations.
 
 - name: Place default index.gmi for Gemini
   copy:
+    src: ../../../config/skel/public_gemini/index.gmi
     dest: /etc/skel/public_gemini/index.gmi
     owner: root
     group: root
     mode: "0644"
-    content: |
-      # Welcome to ATL Pubnix
-
-      => /docs Visit the docs
-      => /rules Read the Code of Conduct
 
 - name: Place default gophermap
   copy:
+    src: ../../../config/skel/public_gopher/gophermap
     dest: /etc/skel/public_gopher/gophermap
     owner: root
     group: root
     mode: "0644"
-    content: |
-      Welcome to ATL Pubnix
 
 - name: Place .profile
   copy:
+    src: ../../../config/skel/.profile
     dest: /etc/skel/.profile
     owner: root
     group: root
     mode: "0644"
-    content: |
-      # ~/.profile - default profile for pubnix
-      [ -r /etc/profile ] && . /etc/profile
-      # Ensure ~/bin is on PATH
-      case :$PATH: in
-        *:$HOME/bin:*) ;;
-        *) PATH="$HOME/bin:$PATH" ;;
-      esac
 
 - name: Place .bashrc
   copy:
+    src: ../../../config/skel/.bashrc
     dest: /etc/skel/.bashrc
     owner: root
     group: root
     mode: "0644"
-    content: |
-      # ~/.bashrc - defaults
-      alias ll='ls -lah'
-      alias grep='grep --color=auto'
-      export EDITOR=${EDITOR:-nano}
 
 - name: Place SSH client sample config
   copy:
+    src: ../../../config/skel/.ssh/config
     dest: /etc/skel/.ssh/config
     owner: root
     group: root
     mode: "0600"
-    content: |
-      # Sample SSH client configuration (uncomment and edit to use)
-      # Host pubnix
-      #   HostName example.org
-      #   User yourname
-      #   IdentityFile ~/.ssh/id_ed25519

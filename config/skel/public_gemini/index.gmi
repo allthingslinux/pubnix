@@ -1,0 +1,4 @@
+# Welcome to ATL Pubnix
+
+=> /docs Visit the docs
+=> /rules Read the Code of Conduct
