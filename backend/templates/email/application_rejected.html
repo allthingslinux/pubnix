@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <p>Hi {{ full_name }},</p>
+    <p>Thank you for applying to ATL Pubnix. After review, we are unable to approve your application at this time.</p>
+    {% if review_notes %}
+    <p>Notes from reviewer: {{ review_notes }}</p>
+    {% endif %}
+    <p>You may reapply in the future.</p>
+    <p>— ATL Pubnix</p>
+  </body>
+</html>

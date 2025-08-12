@@ -29,17 +29,17 @@ test: ## Run all tests
 	docker-compose -f docker/testing/docker-compose.yml down
 
 test-unit: ## Run unit tests only
-	cd backend && python -m pytest tests/unit/ -v
+	cd backend && uv run pytest tests/ -v
 
 test-integration: ## Run integration tests only
-	cd backend && python -m pytest tests/integration/ -v
+	cd backend && uv run pytest tests/integration/ -v
 
 lint: ## Run code linting
-	cd backend && flake8 .
+	cd backend && uv run ruff check .
 	cd web && npm run lint
 
 format: ## Format code
-	cd backend && black . && isort .
+	cd backend && uv run ruff format .
 	cd web && npm run format
 
 clean: ## Clean up development environment
@@ -54,7 +54,7 @@ build: ## Build all Docker images
 setup-dev: ## Set up development environment (first time)
 	@echo "Setting up ATL Pubnix development environment..."
 	@echo "Installing backend dependencies..."
-	cd backend && python3 -m venv venv && . venv/bin/activate && pip install -r requirements.txt -r requirements-dev.txt
+	cd backend && uv sync --dev
 	@echo "Installing web dependencies..."
 	cd web && npm install
 	@echo "Building Docker images..."

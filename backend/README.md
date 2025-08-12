@@ -16,8 +16,8 @@ Core system services and APIs for the ATL Pubnix system.
 
 ```bash
 cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-python -m pytest tests/
+uv sync --dev
+uv run pytest tests/
+uv run ruff check .
+uv run ruff format .
 ```

@@ -1,20 +1,23 @@
 # ATL Pubnix Implementation Plan
 
-- [-] 1. Set up project structure and core infrastructure
+- [x] 1. Set up project structure and core infrastructure
+
   - Create monorepo directory structure for all pubnix components
   - Initialize git repository with appropriate .gitignore and README
   - Set up basic CI/CD pipeline configuration for automated testing
   - Create Docker development environment for local testing
   - _Requirements: 9.1, 9.2_
 
-- [ ] 2. Implement user data models and database schema
-  - Create SQLite database schema for user accounts, applications, and metrics
-  - Write Python data models using SQLAlchemy for User, Application, and ResourceLimits entities
-  - Implement database migration system for schema updates
+- [x] 2. Implement user data models and database schema
+
+  - Create PostgreSQL database schema for user accounts, applications, and metrics
+  - Write Python data models using SQLModel for User, Application, and ResourceLimits entities
+  - Implement database migration system using Alembic for schema updates
   - Create unit tests for data model validation and constraints
   - _Requirements: 1.3, 8.2_
 
 - [ ] 3. Build user application and approval system
+
   - Create web application using Flask/FastAPI for user signup forms
   - Implement application submission workflow with validation
   - Build administrative interface for reviewing and approving applications
@@ -23,6 +26,7 @@
   - _Requirements: 1.1, 1.2, 1.4_
 
 - [ ] 4. Develop automated user account provisioning
+
   - Write shell scripts for creating user accounts with proper home directory setup
   - Implement skeleton file deployment system for new user environments
   - Create user account modification and suspension utilities
@@ -31,6 +35,7 @@
   - _Requirements: 1.3, 2.3, 10.4_
 
 - [ ] 5. Implement SSH access and authentication system
+
   - Configure SSH server with security hardening and key-only authentication
   - Create SSH key management system for user key upload and rotation
   - Implement session timeout and concurrent session limiting
@@ -39,6 +44,7 @@
   - _Requirements: 2.1, 2.4, 2.5_
 
 - [ ] 6. Build resource management and monitoring system
+
   - Implement disk quota system using Linux quota utilities
   - Create systemd user slice configuration for CPU and memory limits
   - Build process limiting system using PAM and systemd
@@ -48,6 +54,7 @@
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
 - [ ] 7. Develop web hosting infrastructure
+
   - Configure Apache/Nginx for serving user directories from ~/public_html
   - Implement URL routing for atl.sh/~username pattern
   - Create CGI execution environment with security sandboxing
@@ -57,6 +64,7 @@
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
 - [ ] 8. Implement security and monitoring systems
+
   - Configure fail2ban for SSH brute force protection
   - Set up AppArmor profiles for user process isolation
   - Implement comprehensive audit logging system
@@ -66,6 +74,7 @@
   - _Requirements: 5.5, 7.4, 8.4_
 
 - [ ] 9. Build community communication features
+
   - Implement traditional Unix communication tools (write, wall, finger)
   - Create bulletin board system using filesystem-based storage
   - Set up shared collaboration directories with proper permissions
@@ -75,6 +84,7 @@
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
 - [ ] 10. Develop administrative dashboard and tools
+
   - Create web-based administrative interface for user management
   - Implement system health monitoring dashboard with real-time metrics
   - Build user activity reporting and analytics system
@@ -84,6 +94,7 @@
   - _Requirements: 7.1, 7.2, 7.5_
 
 - [ ] 11. Implement backup and disaster recovery system
+
   - Create automated backup system for user data and system configuration
   - Implement backup encryption and secure storage to Hetzner Storage Box
   - Build disaster recovery procedures and system restoration tools
@@ -92,6 +103,7 @@
   - _Requirements: 7.3, 9.4_
 
 - [ ] 12. Build documentation and onboarding system
+
   - Create comprehensive user documentation and getting-started guides
   - Implement dynamic welcome messages and system orientation
   - Build interactive tutorial system for Unix basics and pubnix features
@@ -101,6 +113,7 @@
   - _Requirements: 10.1, 10.2, 10.3, 10.5_
 
 - [ ] 13. Develop deployment and infrastructure automation
+
   - Create Terraform/Ansible scripts for Hetzner Cloud VPS provisioning
   - Implement automated system deployment and configuration management
   - Build DNS configuration automation for atl.sh domain
@@ -110,6 +123,7 @@
   - _Requirements: 9.1, 9.2, 9.3, 9.5_
 
 - [ ] 14. Implement future integration preparation
+
   - Create modular authentication backend system for LDAP/SSO integration
   - Build API endpoints for external user management and provisioning
   - Implement user data export/import system for portal integration
@@ -118,6 +132,7 @@
   - _Requirements: 8.1, 8.3, 8.5_
 
 - [ ] 15. Build comprehensive testing and quality assurance
+
   - Create end-to-end testing suite covering complete user workflows
   - Implement performance testing for concurrent user load
   - Build security testing automation for penetration testing
@@ -127,6 +142,7 @@
   - _Requirements: All requirements validation_
 
 - [ ] 16. Develop monitoring and alerting infrastructure
+
   - Implement comprehensive system metrics collection using Prometheus/similar
   - Create alerting system for resource exhaustion and security incidents
   - Build user activity monitoring and anomaly detection
@@ -136,6 +152,7 @@
   - _Requirements: 7.2, 7.4, 5.2_
 
 - [ ] 17. Create landing page and public interface
+
   - Build responsive landing page explaining ATL Pubnix and community
   - Implement user signup interface with application form
   - Create public documentation and FAQ system
