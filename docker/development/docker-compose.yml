@@ -8,9 +8,9 @@ services:
     container_name: atl-pubnix-dev
     hostname: atl-pubnix-dev
     ports:
-      - "2222:22"    # SSH access
-      - "8080:80"    # Web interface
-      - "8443:443"   # HTTPS (development)
+      - "${DEV_SSH_PORT:-2222}:22"    # SSH access
+      - "${DEV_HTTP_PORT:-8080}:80"   # Web interface
+      - "${DEV_HTTPS_PORT:-8443}:443" # HTTPS (development)
     volumes:
       - ../../backend:/opt/pubnix/backend
       - ../../web:/opt/pubnix/web
@@ -41,7 +41,7 @@ services:
       - POSTGRES_USER=pubnix
       - POSTGRES_PASSWORD=dev_password_change_in_production
     ports:
-      - "5432:5432"
+      - "${DEV_DB_PORT:-5432}:5432"
     volumes:
       - pubnix_db:/var/lib/postgresql/data
       - ../../scripts/database/init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -52,7 +52,7 @@ services:
     image: redis:7-alpine
     container_name: atl-pubnix-redis-dev
     ports:
-      - "6379:6379"
+      - "${DEV_REDIS_PORT:-6379}:6379"
     volumes:
       - pubnix_redis:/data
     networks:
@@ -64,7 +64,7 @@ services:
       dockerfile: ../docker/development/Dockerfile.web
     container_name: atl-pubnix-web-dev
     ports:
-      - "3000:3000"  # Development server
+      - "${DEV_WEB_PORT:-3000}:3000"  # Development server
     volumes:
       - ../../web:/app
       - /app/node_modules
