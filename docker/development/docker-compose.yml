@@ -23,6 +23,7 @@ services:
       - PUBNIX_ENV=development
       - PUBNIX_DEBUG=true
       - PUBNIX_LOG_LEVEL=DEBUG
+      - DATABASE_URL=postgresql://pubnix:dev_password_change_in_production@database:5432/pubnix_dev
     networks:
       - pubnix-net
     privileged: true  # Required for user management and systemd
