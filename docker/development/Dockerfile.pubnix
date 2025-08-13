@@ -60,8 +60,14 @@ COPY config/nginx/nginx_dev.conf /etc/nginx/nginx.conf
 COPY config/nginx/conf.d/ipv4_default.conf /etc/nginx/conf.d/ipv4_default.conf
 COPY config/nginx/sites-available/pubnix-dev /etc/nginx/sites-available/default
 
-# Create application directories
-RUN mkdir -p /opt/pubnix/{backend,web,scripts,config,docs,logs}
+# Create application directories (avoid brace expansion issues)
+RUN mkdir -p \
+    /opt/pubnix/backend \
+    /opt/pubnix/web \
+    /opt/pubnix/scripts \
+    /opt/pubnix/config \
+    /opt/pubnix/docs \
+    /opt/pubnix/logs
 RUN chown -R pubnix:pubnix /opt/pubnix
 
 # Set up Python environment using uv and pyproject
@@ -79,11 +85,13 @@ RUN systemctl enable ssh nginx || true
 # Create development user accounts
 RUN useradd -m -s /bin/bash -G sudo testuser1 && \
     echo "testuser1:testpass" | chpasswd && \
-    mkdir -p /home/testuser1/.ssh /home/testuser1/public_html
+    mkdir -p /home/testuser1/.ssh /home/testuser1/public_html && \
+    chown -R testuser1:testuser1 /home/testuser1
 
 RUN useradd -m -s /bin/bash testuser2 && \
     echo "testuser2:testpass" | chpasswd && \
-    mkdir -p /home/testuser2/.ssh /home/testuser2/public_html
+    mkdir -p /home/testuser2/.ssh /home/testuser2/public_html && \
+    chown -R testuser2:testuser2 /home/testuser2
 
 # Set up development SSH keys
 COPY docker/development/keys/dev_host_key /etc/ssh/ssh_host_rsa_key

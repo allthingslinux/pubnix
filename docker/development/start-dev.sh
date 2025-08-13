@@ -19,6 +19,15 @@ nginx -t && service nginx start || (echo "nginx failed to start" && cat /var/log
 # Start fcgiwrap for CGI (socket at /var/run/fcgiwrap.socket)
 service fcgiwrap start || true
 
+# Fix dev users' home ownership and permissions (in case volumes persisted)
+for d in /home/*; do
+  [ -d "$d" ] || continue
+  user="$(basename "$d")"
+  chown -R "$user:$user" "$d" || true
+  [ -d "$d/.ssh" ] && chmod 700 "$d/.ssh" && chown -R "$user:$user" "$d/.ssh" || true
+  [ -d "$d/public_html" ] && chmod 755 "$d/public_html" && chown -R "$user:$user" "$d/public_html" || true
+done
+
 # Activate Python virtual environment and start backend services
 # Start the backend API server in development mode if present
 if [ -f /opt/pubnix/backend/pyproject.toml ]; then
