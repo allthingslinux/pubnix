@@ -1,6 +1,7 @@
 server {
     listen 80 default_server;
-    listen [::]:80 default_server;
+    # IPv6 disabled in some dev environments; use IPv4 only
+    # listen [::]:80 default_server;
 
     server_name localhost atl-pubnix-dev;
     root /var/www/html;
