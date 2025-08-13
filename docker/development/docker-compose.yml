@@ -32,6 +32,24 @@ services:
       - /run/lock
     # extra mounts for systemd
     extra_hosts: []
+    develop:
+      watch:
+        - action: sync
+          path: ../../backend
+          target: /opt/pubnix/backend
+          ignore:
+            - .venv/
+            - __pycache__/
+            - .pytest_cache/
+        - action: sync
+          path: ../../scripts
+          target: /opt/pubnix/scripts
+        - action: sync
+          path: ../../docs
+          target: /opt/pubnix/docs
+        - action: sync+restart
+          path: config/nginx/sites-available/pubnix-dev
+          target: /etc/nginx/sites-available/default
 
   database:
     image: postgres:15-alpine
@@ -77,6 +95,15 @@ services:
       - "pubnix-dev:127.0.0.1"
     depends_on:
       - pubnix-dev
+    develop:
+      watch:
+        - action: sync
+          path: ../../web
+          target: /app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: ../../web/package.json
 
 volumes:
   pubnix_home:
