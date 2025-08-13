@@ -16,6 +16,9 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    # Ensure /~user (no trailing slash) internally maps to /~user/
+    rewrite ^/~([^/]+)$ /~$1/ last;
+
     # User web directories
     location ~ ^/~(.+?)(/.*)?$ {
         alias /home/$1/public_html$2;
