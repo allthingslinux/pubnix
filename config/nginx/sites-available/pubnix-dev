@@ -51,9 +51,9 @@ server {
         try_files $uri $uri/ @frontend;
     }
 
-    # Frontend fallback for SPA routing
+    # Frontend fallback for SPA routing (proxy to web-dev service)
     location @frontend {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://web-dev:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;

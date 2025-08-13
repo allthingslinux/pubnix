@@ -73,6 +73,8 @@ services:
       - VITE_API_URL=http://localhost:8080/api
     networks:
       - pubnix-net
+    extra_hosts:
+      - "pubnix-dev:127.0.0.1"
     depends_on:
       - pubnix-dev
 
