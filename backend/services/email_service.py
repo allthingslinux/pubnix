@@ -14,6 +14,7 @@ class EmailService:
     """Service for sending email notifications."""
 
     def __init__(self):
+        self.is_dev = os.getenv("PUBNIX_ENV", "development").lower() != "production"
         self.smtp_host = os.getenv("SMTP_HOST", "localhost")
         self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
         self.smtp_username = os.getenv("SMTP_USERNAME")
@@ -36,6 +37,11 @@ class EmailService:
         text_content: Optional[str] = None,
     ) -> bool:
         """Send an email using SMTP."""
+        # In development environments, do not attempt to send; just log and succeed
+        if self.is_dev:
+            print(f"[dev-email] To: {to_email} | Subject: {subject}")
+            return True
+
         try:
             message = EmailMessage()
             message["From"] = f"{self.from_name} <{self.from_email}>"

@@ -42,6 +42,12 @@ services:
             - .venv/
             - __pycache__/
             - .pytest_cache/
+        - action: sync+restart
+          path: ../../config/nginx/nginx_dev.conf
+          target: /etc/nginx/nginx.conf
+        - action: sync+restart
+          path: ../../config/nginx/conf.d
+          target: /etc/nginx/conf.d
         - action: sync
           path: ../../scripts
           target: /opt/pubnix/scripts
