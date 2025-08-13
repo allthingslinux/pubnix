@@ -44,6 +44,7 @@ RUN apt-get update && apt-get install -y \
     cron \
     rsyslog \
     logrotate \
+    fcgiwrap \
     && rm -rf /var/lib/apt/lists/*
 
 # Create pubnix system user

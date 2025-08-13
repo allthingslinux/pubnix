@@ -10,20 +10,18 @@ sleep 5
 service ssh start
 
 # Start nginx
-service nginx start
+nginx -t && service nginx start || (echo "nginx failed to start" && cat /var/log/nginx/error.log || true)
 
-# Start rsyslog
-service rsyslog start
+# Start fcgiwrap for CGI (socket at /var/run/fcgiwrap.socket)
+service fcgiwrap start || true
 
 # Activate Python virtual environment and start backend services
-cd /opt/pubnix/backend
-source venv/bin/activate
-
-# Start the backend API server in development mode
-python -m uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload &
-
-# Start resource monitoring daemon
-python -m resource_monitor.daemon --dev &
+# Start the backend API server in development mode if present
+if [ -f /opt/pubnix/backend/main.py ] || [ -f /opt/pubnix/backend/api/main.py ]; then
+  if command -v uvicorn >/dev/null 2>&1; then
+    (cd /opt/pubnix/backend && uvicorn main:app --host 0.0.0.0 --port 8000 --reload) &
+  fi
+fi
 
 # Keep container running
 tail -f /dev/null
