@@ -57,6 +57,7 @@ RUN ssh-keygen -A
 
 # Set up nginx
 COPY config/nginx/nginx_dev.conf /etc/nginx/nginx.conf
+COPY config/nginx/conf.d/ipv4_default.conf /etc/nginx/conf.d/ipv4_default.conf
 COPY config/nginx/sites-available/pubnix-dev /etc/nginx/sites-available/default
 
 # Create application directories
