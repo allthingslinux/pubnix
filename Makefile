@@ -12,9 +12,9 @@ dev-up: ## Start development environment
 		docker-compose -f docker/development/docker-compose.yml up -d; \
 		echo ""; \
 		echo "Development environment started!"; \
-		echo "Web interface: http://localhost:8080"; \
-		echo "SSH access: ssh -p 2222 testuser1@localhost (password: testpass)"; \
-		echo "Web dev server: http://localhost:3000"; \
+		echo "Web interface: http://localhost:${DEV_HTTP_PORT:-8080}"; \
+		echo "SSH access: ssh -p ${DEV_SSH_PORT:-2222} testuser1@localhost (password: testpass)"; \
+		echo "Web dev server: http://localhost:${DEV_WEB_PORT:-3000}"; \
 	else \
 		echo "[skip] docker/development/docker-compose.yml not found"; \
 	fi
